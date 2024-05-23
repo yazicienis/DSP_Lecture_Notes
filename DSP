@@ -1,0 +1,2272 @@
+\documentclass[a4paper,11pt,openany]{book}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+
+\usepackage{microtype}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+
+\usepackage{geometry}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{fancyhdr}
+\usepackage{palatino, mathpazo}
+\geometry{a4paper, margin=1.4in}
+\definecolor{titlecolor}{RGB}{1, 123, 206}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+
+\fancyhead[LE,RO]{\slshape\rightmark} % Right header on even pages and left header on odd pages
+\fancyfoot[C]{\thepage} % Centered page number in the footer
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}} % Modifies chapter mark (left out)
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}} % Modifies section mark (right)
+
+% Customizing the look
+\definecolor{chaptercolor}{RGB}{1, 123, 206} % Custom color for chapter titles
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{chaptercolor}}
+  {\filright\Large\chaptertitlename\ \thechapter}
+  {18pt}
+  {\titlerule\vspace{2pt}\titlerule\vspace{2pt}\Huge}
+
+\title{Lecture Notes on Digital Signal Processing}
+\author{Enis Yazici \\ 
+\texttt{SRH Hochschule Heidelberg}\\
+\texttt{enis.yazici@srh.de}}
+\date{}
+
+\pgfplotsset{compat=1.18}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+
+\noindent
+\begin{center}
+    \textbf{Abstract}
+\end{center}
+\noindent
+These lecture notes provide a comprehensive overview of digital signal processing (DSP), covering fundamental concepts, discrete-time signals and systems, the Z-transform, convolution, stability, and causality. Designed for university students and professionals, these notes include detailed explanations, mathematical derivations, and practical examples to facilitate learning and understanding of DSP principles.
+
+
+\tableofcontents
+\mainmatter
+
+
+\chapter{Introduction}
+
+
+\textbf{Digital Signal Processing} refers to the manipulation of signals after they have been converted into digital form. In this context, a \textbf{signal} can be literally anything that carries information -sound, video, images, temperature, texts, etc. These signals are mostly in analog forms which are in continuous intervals. They are converted into digital format, -basically a sequence of numbers-, using analog-to-digital converters (\textbf{ADC}s).  
+
+\ 
+
+Once they are generated in digital form, we apply a wide range of algorithms and techniques to these digital signals for e.g., filtering, compression, analysis and more. In this manner, one can say that DSP is a fundamental tool for modern communication systems. From cellular phones to satellites, DSP techniques are used to transmit/receive signals efficiently and, of course, accurately. 
+Moreover, DSP allows us to enhance signal quality and enables sophisticated analysis. For example, we can reduce noise in audio signals or identify patterns in signal data using DSP tools.
+
+\ 
+
+Normally the signals are physical objects. Sound is the oscillation of air pressure values, images are electromagnetic waves (in other words, photons) hitting to the artificial or biological sensors like cameras and eyes. In communication engineering we take these physical things and convert them into pure mathematical  objects, like, series of numbers, that we call signals.
+Signals are represented in two major sets: continuous (analog) signals and discrete (digital) signals. At this point, mathematics allows us to precisely describe the signals as functions, and we analyze, manipulate, process these functions and re-convert them into physical objects.
+
+\ 
+
+The processing tools are in general called systems and systems are represented by mathematical models. A model can be created using differential equations and linear algebraic tools. Re-calling the mathematical understanding is essential to simulate and work on these models.
+
+\
+
+We analyze the signals (using frequency analysis), we transform them from time-domain to frequency-domain (Fourier Transform), we design filters, we optimize the systems and we generate efficient ways to understand the data. All we need is a strong mathematical background in this context.
+
+\ 
+
+Using mathematics properly is a common challenge in engineering education, where students struggle to understand advanced mathematical concepts that are learnt in earlier courses with their practical applications. This is because we teach them mathematical concepts in a vacuum, without showing them the real-world applications. These lecture notes provide a context by demonstrating how these theoretical tools are applied in digital signal processing.
+
+\ 
+
+The following chapters summarize key mathematical concepts and then practical examples and case studies will be in our focus to understand how maths is used to solve real DSP problems. In this manner, visual aids like graphs and flowcharts will be presented to make abstract concepts more concrete.
+
+
+\newpage
+
+\chapter{Fundamental Concepts}
+
+\section{Signals and Systems}
+
+Signals and systems are foundational concepts in the field of DSP. Understanding these concepts is crucial for analyzing and designing systems that process signals in various engineering applications, such as communication systems, control systems, audio and video processing, biomedical signal processing, and more.
+
+\ 
+
+The study of signals and systems has a rich history, beginning with early developments in telegraphy and telephony in the late 19th and early 20th centuries. Key figures such as Harry Nyquist and Claude Shannon made significant contributions to communication theory, which laid the groundwork for modern signal processing. Nyquist's work on sampling theory and Shannon's information theory are particularly noteworthy.
+
+\subsubsection{Definitions}
+A \textbf{signal} is a function that conveys information about the behavior or attributes of some phenomenon. Signals can be continuous or discrete. 
+
+\ 
+
+- \textbf{Continuous-time signals} are defined for every value of time \( t \). For example, \( x(t) = \sin(2 \pi f t) \) is a continuous-time signal where \( t \) is a continuous variable.
+
+\ 
+
+- \textbf{Discrete-time signals} are defined only at discrete points in time. For example, \( x[n] = \sin(2 \pi f n T) \) where \( n \) is an integer, and \( T \) is the sampling period.
+
+\ 
+
+
+A \textbf{system} is a set of rules or a mathematical operation that acts on a signal to produce another signal. Systems can be described by differential equations (for continuous-time systems) or difference equations (for discrete-time systems). A system can be classified based on its properties, such as linearity, time-invariance, causality, and stability.
+
+\ 
+
+\textbf{Mathematical Representation}
+
+\ 
+
+Continuous-time and discrete-time signals can be represented mathematically as follows:
+
+- \textbf{Continuous-time signal:}
+\begin{equation}
+x(t) = A \sin(2 \pi f t + \phi)
+\end{equation}
+where \( A \) is the amplitude, \( f \) is the frequency, and \( \phi \) is the phase of the signal.
+
+- \textbf{Discrete-time signal:}
+\begin{equation}
+x[n] = A \sin(2 \pi f n T + \phi)
+\end{equation}
+where \( n \) is the sample index and \( T \) is the sampling period.
+
+\subsubsection{Practical Examples and Applications}
+Understanding signals and systems is crucial for various engineering applications, including but not limited to:
+
+\paragraph{Communication Systems}
+In communication systems, signals carry information from a transmitter to a receiver. Understanding signal properties and system behavior allows engineers to design efficient encoding, transmission, and decoding techniques. For example, modulation schemes such as Amplitude Modulation (AM) and Frequency Modulation (FM) are used to encode information onto carrier signals.
+
+\paragraph{Control Systems}
+Control systems use signals to regulate the behavior of dynamic systems. For instance, in an automatic temperature control system, a sensor measures the temperature (input signal), and a controller adjusts the heater's output (output signal) to maintain the desired temperature. Understanding the system's transfer function and stability is essential for designing effective control strategies.
+
+\paragraph{Audio and Video Processing}
+In audio and video processing, signals represent sound and images. Techniques such as filtering, compression, and enhancement are applied to improve signal quality. For example, noise reduction algorithms in audio processing use digital filters to remove unwanted noise from recordings.
+
+\paragraph{Biomedical Signal Processing}
+Biomedical signal processing involves analyzing physiological signals such as ECG (electrocardiogram) and EEG (electroencephalogram) to diagnose medical conditions. Understanding the characteristics of these signals and the systems that generate them enables the development of diagnostic tools and monitoring systems.
+
+\section{Analog vs. Digital Signals}
+
+\subsection{Analog Signals}
+Analog signals are continuous in both time and amplitude. They can take any value in a given range and are described by continuous functions. Examples of analog signals include audio signals, temperature variations, and ECG signals.
+
+\paragraph{Example: Audio Signal}
+An analog audio signal represents sound waves as a continuous function of time. The amplitude of the signal corresponds to the air pressure variations caused by sound waves.
+
+\subsection{Digital Signals}
+Digital signals are discrete in time and amplitude. They can only take on a finite number of values and are described by sequences of numbers. Examples of digital signals include digital audio recordings, digital images, and computer data.
+
+\paragraph{Example: Digital Audio Signal}
+A digital audio signal is obtained by sampling an analog audio signal at discrete time intervals and quantizing the amplitude values. This digital representation can be processed, stored, and transmitted more efficiently than the original analog signal.
+
+\subsection{Conversion from Analog to Digital}
+The process of converting an analog signal to a digital signal involves two main steps: sampling and quantization.
+
+\paragraph{Sampling}
+Sampling is the process of converting a continuous-time signal into a discrete-time signal by taking periodic samples. According to the Nyquist-Shannon sampling theorem, the sampling frequency \( f_s \) must be at least twice the highest frequency component of the signal to avoid aliasing.
+
+\begin{equation}
+x[n] = x(nT_s)
+\end{equation}
+where \( T_s \) is the sampling period, and \( f_s = \frac{1}{T_s} \) is the sampling frequency.
+
+\paragraph{Quantization}
+Quantization is the process of mapping continuous amplitude values to discrete amplitude values. This step introduces quantization error, which is the difference between the actual analog value and the quantized digital value.
+
+\begin{equation}
+x_q[n] = Q(x[n])
+\end{equation}
+where \( Q(\cdot) \) is the quantization function.
+
+
+\ 
+
+\section{Time Domain and Frequency Domain}
+
+In signal processing, we often analyze and manipulate signals in two primary domains: the time domain and the frequency domain. Each domain offers a different perspective and set of tools for understanding and working with signals.
+
+\subsection{Time Domain}
+The time domain represents a signal as it varies over time. When we observe or measure a signal directly, we usually see it in the time domain. This is the most intuitive way to understand a signal's behavior, especially for signals that change over time, such as audio signals or sensor readings.
+
+\paragraph{Representation}
+In the time domain, a signal \( x(t) \) for continuous time or \( x[n] \) for discrete time is represented as a function of time. The amplitude of the signal is plotted against time.
+
+\begin{equation}
+x(t) = A \sin(2 \pi f t + \phi)
+\end{equation}
+where:
+\begin{itemize}
+    \item \( A \) is the amplitude, representing the signal's maximum value.
+    \item \( f \) is the frequency, indicating how many cycles the signal completes per second.
+    \item \( \phi \) is the phase, determining the signal's horizontal shift.
+\end{itemize}
+
+\paragraph{Example: Sine Wave}
+A simple example of a time-domain signal is a sine wave. It can be represented as:
+
+\begin{equation}
+x(t) = \sin(2 \pi 50 t)
+\end{equation}
+
+This equation describes a sine wave with a frequency of 50 Hz. The plot of this signal would show a smooth, periodic oscillation over time.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$t$ (s)},
+            ylabel={$x(t)$},
+            title={Sine Wave in Time Domain},
+            grid=major,
+            xmin=0, xmax=0.1,
+            ymin=-1.2, ymax=1.2
+        ]
+            \addplot[smooth,domain=0:0.1,samples=500] {sin(2*pi*50*x)};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Sine Wave in Time Domain}
+\end{figure}
+
+\paragraph{Applications}
+Analyzing signals in the time domain is useful for understanding how a signal behaves over time. For example:
+\begin{itemize}
+    \item \textbf{Audio Processing}: Understanding how sound waves vary over time helps in noise reduction and echo cancellation.
+    \item \textbf{Biomedical Signal Processing}: Observing ECG or EEG signals over time is crucial for diagnosing heart or brain conditions.
+    \item \textbf{Communication Systems}: Time-domain analysis helps in understanding signal transmission and reception characteristics.
+\end{itemize}
+
+\subsection{Frequency Domain}
+The frequency domain represents a signal in terms of its frequency components rather than time. While the time domain shows how a signal changes over time, the frequency domain shows how much of the signal lies within each given frequency band over a range of frequencies.
+
+\paragraph{Representation}
+In the frequency domain, a signal \( X(f) \) for continuous frequency or \( X[k] \) for discrete frequency is represented as a function of frequency. The amplitude (or magnitude) and phase of each frequency component are plotted against frequency.
+
+\begin{equation}
+X(f) = \text{Magnitude at frequency } f
+\end{equation}
+
+\paragraph{Example: Pure Tone}
+A pure tone, such as a 50 Hz sine wave, would appear in the frequency domain as a single spike at 50 Hz, indicating that all the signal's energy is concentrated at that frequency.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$f$ (Hz)},
+            ylabel={$|X(f)|$},
+            title={Frequency Domain Representation},
+            grid=major,
+            xmin=0, xmax=100,
+            ymin=0, ymax=1.2
+        ]
+            \addplot[only marks, mark=*] coordinates {
+                (50,1)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Frequency Domain Representation of a 50 Hz Sine Wave}
+\end{figure}
+
+\paragraph{Applications}
+Analyzing signals in the frequency domain is particularly useful for:
+\begin{itemize}
+    \item \textbf{Filtering}: Designing and applying filters to remove unwanted components from a signal.
+    \item \textbf{Modulation and Demodulation}: Techniques used in communication systems to encode and decode information.
+    \item \textbf{Spectrum Analysis}: Understanding the frequency content of signals in audio engineering, vibration analysis, and other fields.
+\end{itemize}
+
+\subsection{Key Differences and Relationships}
+Understanding both the time and frequency domains is essential because they provide complementary views of the same signal. 
+
+\paragraph{Key Differences}
+\begin{itemize}
+    \item \textbf{Time Domain}: Focuses on how the signal varies over time. Useful for observing the signal's behavior and temporal characteristics.
+    \item \textbf{Frequency Domain}: Focuses on how the signal's energy is distributed across different frequencies. Useful for analyzing the signal's spectral characteristics.
+\end{itemize}
+
+\paragraph{Relationships}
+The time domain and frequency domain are related through mathematical transforms. While we have not yet introduced the Fourier Transform, it is one of the key tools that connect these two domains. Understanding this relationship allows us to switch between the time and frequency domains to utilize the advantages of each.
+
+\paragraph{Fourier Transform}
+The Fourier Transform of a continuous-time signal \( x(t) \) is defined as:
+
+\begin{equation}
+X(f) = \int_{-\infty}^{\infty} x(t) e^{-j 2 \pi f t} dt
+\end{equation}
+
+The inverse Fourier Transform is used to convert the signal back to the time domain:
+
+\begin{equation}
+x(t) = \int_{-\infty}^{\infty} X(f) e^{j 2 \pi f t} df
+\end{equation}
+
+\paragraph{Discrete Fourier Transform (DFT)}
+For discrete-time signals, the Discrete Fourier Transform (DFT) is used to transform a signal from the time domain to the frequency domain. The DFT of a discrete-time signal \( x[n] \) is defined as:
+
+\begin{equation}
+X[k] = \sum_{n=0}^{N-1} x[n] e^{-j \frac{2 \pi}{N} kn}
+\end{equation}
+where \( N \) is the number of samples.
+
+The inverse DFT is given by:
+
+\begin{equation}
+x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] e^{j \frac{2 \pi}{N} kn}
+\end{equation}
+
+\paragraph{Example: Fourier Transform of a Sine Wave}
+Consider a sine wave \( x(t) = A \sin(2 \pi f t) \). The Fourier Transform of this sine wave is given by:
+
+\begin{equation}
+X(f) = \frac{A}{2j} [\delta(f - f_0) - \delta(f + f_0)]
+\end{equation}
+where \( \delta(f) \) is the Dirac delta function, indicating that the sine wave has frequency components at \( \pm f_0 \).
+
+\section{Practical Considerations}
+In practical DSP systems, signals are often digitized for processing. This involves careful consideration of sampling rates, quantization levels, and filtering to ensure the integrity and quality of the processed signal.
+
+\paragraph{Anti-Aliasing Filters}
+Before sampling, an analog signal is typically passed through an anti-aliasing filter to remove frequency components higher than half the sampling frequency, thus preventing aliasing.
+
+\paragraph{Reconstruction Filters}
+After digital processing, the discrete-time signal can be converted back to a continuous-time signal using a reconstruction filter, which interpolates between the discrete samples.
+
+
+\ 
+
+
+\subsection*{Examples}
+
+\textbf{1- Sampling a Continuous-Time Signal}
+
+\ 
+
+Given a continuous-time signal \( x(t) = \cos(2 \pi 50 t) \):
+
+\begin{enumerate}
+    \item Sample the signal at a sampling frequency \( f_s = 200 \) Hz.
+    \item Plot the continuous-time signal and its sampled version.
+    \item Discuss the effect of sampling frequency on the sampled signal.
+\end{enumerate}
+
+
+\ 
+
+\textbf{Solution: } The continuous-time signal is given by:
+\[ x(t) = \cos(2 \pi 50 t) \]
+
+Sampling frequency \( f_s = 200 \) Hz, thus the sampling period \( T_s = \frac{1}{f_s} = \frac{1}{200} \) s.
+
+The sampled signal is:
+\[ x[n] = x(nT_s) = \cos\left(2 \pi 50 \frac{n}{200}\right) = \cos\left(\frac{\pi}{2} n\right) \]
+
+\ 
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=\textwidth,
+                xlabel={$t$ (s)},
+                ylabel={$x(t)$},
+                title={Continuous-Time Signal},
+                grid=major,
+                xmin=0, xmax=0.1,
+                ymin=-1.2, ymax=1.2
+            ]
+                \addplot[smooth,domain=0:0.1,samples=500] {cos(2*pi*50*x)};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Continuous-Time Signal}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=\textwidth,
+                xlabel={$n$},
+                ylabel={$x[n]$},
+                title={Sampled Signal},
+                grid=major,
+                xmin=0, xmax=20,
+                ymin=-1.2, ymax=1.2
+            ]
+                \addplot[only marks, mark=*] plot coordinates {
+                    (0,1) (1,0) (2,-1) (3,0) (4,1) (5,0) (6,-1) (7,0) (8,1) (9,0)
+                    (10,-1) (11,0) (12,1) (13,0) (14,-1) (15,0) (16,1) (17,0) (18,-1) (19,0)
+                };
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Sampled Signal}
+    \end{subfigure}
+    \caption{Continuous and Sampled Signals}
+\end{figure}
+
+\paragraph{Effect of Sampling Frequency: }
+The sampling frequency \( f_s = 200 \) Hz is adequate because it is more than twice the signal frequency \( f = 50 \) Hz, satisfying the Nyquist criterion. If the sampling frequency were lower than \( 2f \), aliasing would occur, causing distortion in the sampled signal.
+
+\ 
+
+\ 
+
+\textbf{2- Quantizing a Signal}
+
+\ 
+
+Given a discrete-time signal \( x[n] = \cos\left(\frac{\pi}{4} n\right) \):
+
+\begin{enumerate}
+    \item Quantize the signal using a 3-bit quantizer over the range \([-1, 1]\).
+    \item Plot the original and quantized signals.
+    \item Calculate the quantization error.
+\end{enumerate}
+
+
+
+\ 
+
+
+\paragraph{Solution: } The discrete-time signal is:
+\[ x[n] = \cos\left(\frac{\pi}{4} n\right) \]
+
+Using a 3-bit quantizer over the range \([-1, 1]\), the quantization levels are:
+\[ Q_i = -1 + \frac{i}{3}, \quad i = 0, 1, 2, \ldots, 7 \]
+
+\ 
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Original and Quantized Signals},
+            grid=major,
+            xmin=0, xmax=20,
+            ymin=-1.2, ymax=1.2
+        ]
+            \addplot[smooth, domain=0:20, samples=21, color=blue, mark=*] {cos(deg(pi/4*x))};
+            \addplot[smooth, domain=0:20, samples=21, color=red, mark=square*] {round((cos(deg(pi/4*x))+1)*3)/3 - 1};
+            \legend{Original Signal, Quantized Signal}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Original and Quantized Signals}
+\end{figure}
+
+
+\ 
+
+Quantization error is the difference between the original and quantized signal:
+\[ e[n] = x[n] - x_q[n] \]
+
+The Mean Squared Quantization Error (MSQE) over one period can be calculated as:
+\[ \text{MSQE} = \frac{1}{N} \sum_{n=0}^{N-1} e[n]^2 \]
+
+For the given signal and quantization levels, let's calculate it over 16 samples (one period of the signal).
+
+\begin{equation}
+\text{MSQE} = \frac{1}{16} \sum_{n=0}^{15} \left( \cos\left(\frac{\pi}{4} n\right) - Q\left(\cos\left(\frac{\pi}{4} n\right)\right) \right)^2
+\end{equation}
+
+Calculating each term and summing:
+
+\[
+\begin{aligned}
+e[0] &= 0, & e[1] &= -0.14, & e[2] &= -0.14, & e[3] &= 0.14, \\
+e[4] &= 0, & e[5] &= -0.14, & e[6] &= -0.14, & e[7] &= 0.14, \\
+e[8] &= 0, & e[9] &= 0.14, & e[10] &= -0.14, & e[11] &= 0.14, \\
+e[12] &= 0, & e[13] &= 0.14, & e[14] &= 0.14, & e[15] &= -0.14
+\end{aligned}
+\]
+
+The quantization error is periodic with a period of 8 samples. Therefore,
+
+\[
+\text{MSQE} = \frac{1}{16} \sum_{n=0}^{15} e[n]^2 = \frac{1}{16} (0^2 + 0.14^2 + 0.14^2 + 0.14^2 + 0 + 0.14^2 + 0.14^2 + 0.14^2) = 0.0196
+\]
+
+Thus, the Mean Squared Quantization Error (MSQE) is approximately \( 0.0196 \).
+
+
+
+
+
+
+
+
+
+
+
+
+\paragraph{3- Aliasing Effect}
+
+\ 
+
+Consider a continuous-time signal \( x(t) = \sin(2 \pi 100 t) \):
+
+\begin{enumerate}
+    \item Sample the signal at a sampling frequency \( f_s = 150 \) Hz.
+    \item Determine the aliased frequency and sketch the resulting signal.
+    \item Explain why aliasing occurs and how it can be avoided.
+\end{enumerate}
+
+\paragraph{Solution: }
+
+The continuous-time signal is given by:
+\[ x(t) = \sin(2 \pi 100 t) \]
+
+Sampling frequency \( f_s = 150 \) Hz, thus the sampling period \( T_s = \frac{1}{f_s} = \frac{1}{150} \) s.
+
+The sampled signal is:
+\[ x[n] = x(nT_s) = \sin\left(2 \pi 100 \frac{n}{150}\right) = \sin\left(\frac{4\pi}{3} n\right) \]
+
+\paragraph{Step 2: Aliased Frequency}
+The aliased frequency \( f_a \) is given by:
+\[ f_a = |f - N \cdot f_s| \]
+where \( N \) is the integer part of \( \frac{f}{f_s} + 0.5 \).
+
+For \( f = 100 \) Hz and \( f_s = 150 \) Hz:
+\[ N = \left\lfloor \frac{100}{150} + 0.5 \right\rfloor = \left\lfloor 0.6667 + 0.5 \right\rfloor = 1 \]
+
+So,
+\[ f_a = |100 - 1 \cdot 150| = |100 - 150| = 50 \, \text{Hz} \]
+
+\ 
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Aliased Signal},
+            grid=major,
+            xmin=0, xmax=20,
+            ymin=-1.2, ymax=1.2
+        ]
+            \addplot[smooth, domain=0:20, samples=21, color=blue, mark=*] {sin(deg(2*pi*50/150*x))};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Aliased Signal}
+\end{figure}
+
+\ 
+
+Aliasing occurs when the sampling frequency is less than twice the highest frequency component of the signal (Nyquist rate). In this case, the sampling frequency \( f_s = 150 \) Hz is less than twice the signal frequency \( f = 100 \) Hz, leading to aliasing. To avoid aliasing, the sampling frequency must be at least \( 2f \), i.e., \( 200 \) Hz in this example.
+
+
+
+\ 
+
+
+
+
+
+\paragraph{4- Fourier Transform of a Sine Wave}
+
+\ 
+
+Given the continuous-time signal \( x(t) = A \sin(2 \pi f_0 t) \):
+
+\begin{enumerate}
+    \item Derive the Fourier Transform of \( x(t) \).
+    \item Sketch the magnitude spectrum of the signal.
+    \item Explain the significance of the Dirac delta function in the context of the Fourier Transform.
+\end{enumerate}
+
+
+
+
+\paragraph{Solution:}
+
+The continuous-time signal is given by:
+\[ x(t) = A \sin(2 \pi f_0 t) \]
+
+Using Euler's formula:
+\[ \sin(2 \pi f_0 t) = \frac{1}{2j} \left( e^{j 2 \pi f_0 t} - e^{-j 2 \pi f_0 t} \right) \]
+
+Thus,
+\[ x(t) = \frac{A}{2j} \left( e^{j 2 \pi f_0 t} - e^{-j 2 \pi f_0 t} \right) \]
+
+The Fourier Transform is:
+\[ X(f) = \int_{-\infty}^{\infty} x(t) e^{-j 2 \pi f t} dt \]
+\[ X(f) = \int_{-\infty}^{\infty} \frac{A}{2j} \left( e^{j 2 \pi f_0 t} - e^{-j 2 \pi f_0 t} \right) e^{-j 2 \pi f t} dt \]
+\[ X(f) = \frac{A}{2j} \int_{-\infty}^{\infty} e^{j 2 \pi (f_0 - f) t} dt - \frac{A}{2j} \int_{-\infty}^{\infty} e^{-j 2 \pi (f_0 + f) t} dt \]
+
+Using the property of the Dirac delta function:
+\[ \int_{-\infty}^{\infty} e^{j 2 \pi (f_0 - f) t} dt = \delta(f - f_0) \]
+\[ \int_{-\infty}^{\infty} e^{-j 2 \pi (f_0 + f) t} dt = \delta(f + f_0) \]
+
+Therefore,
+\[ X(f) = \frac{A}{2j} [\delta(f - f_0) - \delta(f + f_0)] \]
+
+
+\ 
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$f$ (Hz)},
+            ylabel={$|X(f)|$},
+            title={Magnitude Spectrum of $X(f)$},
+            grid=major,
+            xmin=-3, xmax=3,
+            ymin=0, ymax=1.2
+        ]
+            \addplot[only marks, mark=*] coordinates {
+                (1,1) (-1,1)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Magnitude Spectrum}
+\end{figure}
+
+\ 
+
+
+The Dirac delta function \( \delta(f - f_0) \) in the Fourier Transform indicates that the sine wave \( x(t) \) has a frequency component precisely at \( \pm f_0 \). The delta function's presence in the frequency domain shows the exact frequencies present in the signal, which is crucial for understanding and analyzing the signal's spectral content.
+
+
+
+\newpage
+
+
+
+\paragraph{Problem Set}
+
+\begin{enumerate}
+    \item Given the continuous-time signal \( x(t) = 3 \cos(2 \pi 10 t + \frac{\pi}{4}) \) and the discrete-time signal \( x[n] = 2 \sin\left(\frac{\pi}{6} n\right) \):
+
+\begin{enumerate}
+    \item Sketch the continuous-time signal \( x(t) \) for \( t \) in the range \([0, 1]\) seconds.
+    \item Sketch the discrete-time signal \( x[n] \) for \( n \) in the range \([0, 12]\).
+    \item Identify the amplitude, frequency, and phase of each signal.
+\end{enumerate}
+
+\item Consider a continuous-time signal \( x(t) = \cos(2 \pi 40 t) \).
+
+\begin{enumerate}
+    \item Sample the signal at a sampling frequency \( f_s = 100 \) Hz.
+    \item Sketch the sampled signal.
+    \item Explain whether aliasing will occur and why.
+    \item If aliasing occurs, determine the aliased frequency.
+\end{enumerate}
+
+
+\item A discrete-time signal \( x[n] = 0.8 \cos\left(\frac{\pi}{3} n\right) \) needs to be quantized using a 2-bit quantizer over the range \([-1, 1]\).
+
+\begin{enumerate}
+    \item Determine the quantization levels and sketch them.
+    \item Quantize the signal \( x[n] \) for \( n \) in the range \([0, 8]\).
+    \item Calculate the quantization error for each sample.
+\end{enumerate}
+
+\item Given a discrete-time signal \( x[n] = \delta[n-2] - \delta[n-4] \) where \( \delta[n] \) is the discrete-time unit impulse function:
+
+\begin{enumerate}
+    \item Sketch the signal \( x[n] \).
+    \item Describe the signal in terms of its behavior over time.
+    \item Explain the significance of the unit impulse function in signal processing.
+\end{enumerate}
+
+\item Consider the signals described below:
+
+\begin{enumerate}
+    \item A sine wave with frequency 60 Hz.
+    \item A square wave with frequency 20 Hz.
+    \item A signal composed of two sine waves with frequencies 15 Hz and 30 Hz.
+    
+    For each signal:
+    \begin{enumerate}
+        \item Describe how the signal would appear in the frequency domain.
+        \item Explain the concept of harmonic frequencies and how they relate to these signals.
+    \end{enumerate}
+
+\end{enumerate}
+\end{enumerate}
+
+
+\newpage
+
+\paragraph{Solutions}
+
+
+\begin{enumerate}
+    \item The discrete-time signal is given by:
+\[ x[n] = 2 \sin\left(\frac{\pi}{6} n\right) \]
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Discrete-Time Signal},
+            grid=major,
+            xmin=0, xmax=12,
+            ymin=-2.5, ymax=2.5
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,0) (1,1) (2,1.732) (3,2) (4,1.732) (5,1) (6,0) (7,-1) (8,-1.732) (9,-2) (10,-1.732) (11,-1) (12,0)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Discrete-Time Signal}
+\end{figure}
+
+\ 
+
+For the continuous-time signal \( x(t) \):
+\begin{itemize}
+    \item Amplitude \( A = 3 \)
+    \item Frequency \( f = 10 \) Hz
+    \item Phase \( \phi = \frac{\pi}{4} \)
+\end{itemize}
+
+For the discrete-time signal \( x[n] \):
+\begin{itemize}
+    \item Amplitude \( A = 2 \)
+    \item Frequency \( f = \frac{1}{12} \) cycles/sample
+    \item Phase \( \phi = 0 \)
+\end{itemize}
+
+
+\item The continuous-time signal is given by:
+\[ x(t) = \cos(2 \pi 40 t) \]
+
+Sampling frequency \( f_s = 100 \) Hz.
+
+The sampled signal is:
+\[ x[n] = x(nT_s) = \cos\left(2 \pi 40 \frac{n}{100}\right) = \cos\left(\frac{4\pi}{5} n\right) \]
+
+\
+
+ 
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Sampled Signal},
+            grid=major,
+            xmin=0, xmax=10,
+            ymin=-1.2, ymax=1.2
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,1) (1,0.309) (2,-0.809) (3,-1) (4,-0.309) (5,0.809) (6,1) (7,0.309) (8,-0.809) (9,-1) (10,-0.309)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Sampled Signal}
+\end{figure}
+
+\
+ 
+Aliasing will occur if the sampling frequency is less than twice the highest frequency component of the signal (Nyquist rate). Here, the sampling frequency \( f_s = 100 \) Hz is greater than twice the signal frequency \( f = 40 \) Hz, so no aliasing will occur.
+
+
+\item Using a 2-bit quantizer over the range \([-1, 1]\), the quantization levels are:
+\[ Q_i = -1 + \frac{2i}{3}, \quad i = 0, 1, 2, 3 \]
+
+\
+ 
+The discrete-time signal is:
+\[ x[n] = 0.8 \cos\left(\frac{\pi}{3} n\right) \]
+
+Quantize the signal for \( n \) in the range \([0, 8]\):
+\[
+\begin{aligned}
+x[0] &= 0.8 \cos(0) = 0.8 & \rightarrow Q(x[0]) &= 0.6667 \\
+x[1] &= 0.8 \cos\left(\frac{\pi}{3}\right) = 0.4 & \rightarrow Q(x[1]) &= 0.3333 \\
+x[2] &= 0.8 \cos\left(\frac{2\pi}{3}\right) = -0.4 & \rightarrow Q(x[2]) &= -0.3333 \\
+x[3] &= 0.8 \cos(\pi) = -0.8 & \rightarrow Q(x[3]) &= -0.6667 \\
+x[4] &= 0.8 \cos\left(\frac{4\pi}{3}\right) = -0.4 & \rightarrow Q(x[4]) &= -0.3333 \\
+x[5] &= 0.8 \cos\left(\frac{5\pi}{3}\right) = 0.4 & \rightarrow Q(x[5]) &= 0.3333 \\
+x[6] &= 0.8 \cos(2\pi) = 0.8 & \rightarrow Q(x[6]) &= 0.6667 \\
+x[7] &= 0.8 \cos\left(\frac{7\pi}{3}\right) = 0.4 & \rightarrow Q(x[7]) &= 0.3333 \\
+x[8] &= 0.8 \cos\left(\frac{8\pi}{3}\right) = -0.4 & \rightarrow Q(x[8]) &= -0.3333
+\end{aligned}
+\]
+
+\
+ 
+Quantization error is the difference between the original and quantized signal:
+\[ e[n] = x[n] - x_q[n] \]
+
+\[
+\begin{aligned}
+e[0] &= 0.8 - 0.6667 = 0.1333 \\
+e[1] &= 0.4 - 0.3333 = 0.0667 \\
+e[2] &= -0.4 - (-0.3333) = -0.0667 \\
+e[3] &= -0.8 - (-0.6667) = -0.1333 \\
+e[4] &= -0.4 - (-0.3333) = -0.0667 \\
+e[5] &= 0.4 - 0.3333 = 0.0667 \\
+e[6] &= 0.8 - 0.6667 = 0.1333 \\
+e[7] &= 0.4 - 0.3333 = 0.0667 \\
+e[8] &= -0.4 - (-0.3333) = -0.0667
+\end{aligned}
+\]
+
+\item The discrete-time signal is given by:
+\[ x[n] = \delta[n-2] - \delta[n-4] \]
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Discrete-Time Signal},
+            grid=major,
+            xmin=0, xmax=6,
+            ymin=-1.2, ymax=1.2
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,0) (1,0) (2,1) (3,0) (4,-1) (5,0) (6,0)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Discrete-Time Signal}
+\end{figure}
+
+\ 
+
+The signal \( x[n] \) consists of two impulses:
+\begin{itemize}
+    \item An impulse of amplitude \( +1 \) at \( n = 2 \)
+    \item An impulse of amplitude \( -1 \) at \( n = 4 \)
+\end{itemize}
+This means the signal has a value of 1 at \( n = 2 \) and -1 at \( n = 4 \), with zeros elsewhere.
+
+\ 
+
+The unit impulse function \( \delta[n] \) is significant in signal processing because it serves as a basic building block for constructing and analyzing more complex signals. It can be used to test and characterize systems, as it effectively "pings" the system at a specific point in time, allowing for the analysis of the system's response.
+
+\item Describing Frequency Domain Appearance:
+\begin{itemize}
+    \item \textbf{Sine Wave with Frequency 60 Hz:}
+    In the frequency domain, this signal would appear as a single spike at 60 Hz, indicating that all the signal's energy is concentrated at that frequency.
+
+    \item \textbf{Square Wave with Frequency 20 Hz:}
+    A square wave has energy at its fundamental frequency and its odd harmonics. Thus, in the frequency domain, it would have spikes at 20 Hz, 60 Hz, 100 Hz, and so on.
+
+    \item \textbf{Signal Composed of Two Sine Waves (15 Hz and 30 Hz):}
+    In the frequency domain, this signal would have two spikes: one at 15 Hz and another at 30 Hz, indicating the presence of two distinct frequency components.
+\end{itemize}
+
+\ 
+
+Harmonic frequencies are integer multiples of a fundamental frequency. For instance, if a signal has a fundamental frequency \( f_0 \), its harmonics would be at frequencies \( 2f_0, 3f_0, 4f_0 \), and so on. These harmonics are crucial in understanding the spectral content of periodic signals. For example, a square wave with fundamental frequency \( f \) has significant energy at odd harmonics \( 3f, 5f, 7f, \) etc., which contributes to its characteristic shape.
+
+  
+\end{enumerate}
+
+
+\newpage
+
+\chapter{Discrete-Time Signals and Systems}
+
+\section{Discrete-Time Signals}
+
+Discrete-time signals are defined only at discrete points in time. These signals are typically obtained by sampling continuous-time signals. A discrete-time signal \( x[n] \) is represented as a sequence of numbers, where \( n \) is an integer.
+
+\paragraph{Representation}
+A discrete-time signal can be written as:
+\[ x[n] = \{ \ldots, x[-2], x[-1], x[0], x[1], x[2], \ldots \} \]
+For example, \( x[n] = \sin\left(\frac{\pi}{4} n\right) \) is a discrete-time signal sampled from the continuous-time sine wave \( x(t) = \sin\left(2 \pi f t\right) \).
+
+\paragraph{Example: Unit Impulse and Unit Step}
+
+Two important discrete-time signals are the unit impulse \( \delta[n] \) and the unit step \( u[n] \). These signals serve as building blocks for more complex discrete-time signals.
+
+\subparagraph{Unit Impulse}
+The \textbf{unit impulse} \( \delta[n] \) is defined as:
+\[ \delta[n] = \begin{cases} 
+1 & n = 0 \\
+0 & n \neq 0 
+\end{cases} \]
+
+The unit impulse function, also known as the Dirac delta function in continuous time, is a fundamental signal in discrete-time signal processing. It acts as an identity element in convolution operations, meaning that convolving any signal with the unit impulse leaves the original signal unchanged.
+
+\subparagraph{Properties of Unit Impulse}
+
+
+1. \textbf{Sifting Property:}
+\[ x[n] * \delta[n] = x[n] \]
+This property shows that convolving any signal \( x[n] \) with \( \delta[n] \) yields \( x[n] \) itself.
+
+2. \textbf{Shift Property:}
+\[ \delta[n - n_0] \]
+A shifted unit impulse, \( \delta[n - n_0] \), is non-zero only at \( n = n_0 \).
+
+\subparagraph{Example: Using Unit Impulse}
+Consider a discrete-time signal \( x[n] = \{3, 5, -2, 1\} \). This signal can be represented using unit impulses as:
+\[ x[n] = 3\delta[n] + 5\delta[n-1] - 2\delta[n-2] + \delta[n-3] \]
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Representation of $x[n]$ using Unit Impulses},
+            grid=major,
+            xmin=-1, xmax=4,
+            ymin=-3, ymax=6
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,3) (1,5) (2,-2) (3,1)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Discrete-Time Signal $x[n]$}
+\end{figure}
+
+\subparagraph{Unit Step}
+The \textbf{unit step} \( u[n] \) is defined as:
+\[ u[n] = \begin{cases} 
+1 & n \geq 0 \\
+0 & n < 0 
+\end{cases} \]
+
+The unit step function is used to model signals that turn on at a specific point in time and remain on indefinitely. It is useful in analyzing systems' responses to sudden changes in input.
+
+\subparagraph{Properties of Unit Step}
+
+
+1. \textbf{Cumulative Sum:}
+\[ u[n] = \sum_{k=-\infty}^{n} \delta[k] \]
+This property shows that the unit step can be seen as the cumulative sum of the unit impulses up to \( n \).
+
+2. \textbf{Shift Property:}
+\[ u[n - n_0] \]
+A shifted unit step, \( u[n - n_0] \), starts at \( n = n_0 \).
+
+\ 
+
+
+\ 
+
+
+\subparagraph{Example: Using Unit Step}
+Consider a discrete-time signal \( x[n] = u[n] - 2u[n-3] + u[n-5] \). This signal can be interpreted as turning on at \( n = 0 \), decreasing by 2 at \( n = 3 \), and increasing by 1 again at \( n = 5 \).
+
+
+The signal \( x[n] = u[n] - 2u[n-3] + u[n-5] \) can be constructed as follows:
+
+ \( u[n] \) is the unit step function that starts at \( n = 0 \).
+
+ \( -2u[n-3] \) is a scaled and shifted unit step function that subtracts 2 starting from \( n = 3 \).
+
+ \( u[n-5] \) is a shifted unit step function that adds 1 starting from \( n = 5 \).
+
+The resulting signal can be sketched by combining these steps.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Discrete-Time Signal $x[n] = u[n] - 2u[n-3] + u[n-5]$},
+            grid=major,
+            xmin=-1, xmax=10,
+            ymin=-2.5, ymax=1.5,
+            xtick={0,1,2,3,4,5,6,7,8,9},
+            ytick={-2,-1,0,1}
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (-1,0) (0,1) (1,1) (2,1) (3,-1) (4,-1) (5,0) (6,0) (7,0) (8,0) (9,0)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Discrete-Time Signal $x[n]$ using Unit Steps}
+\end{figure}
+
+
+
+
+\subparagraph{Combination of Unit Impulse and Unit Step}
+Unit impulse and unit step functions can be combined to construct more complex signals. For example, a signal that starts at \( n = 1 \) and lasts for 3 samples can be represented as:
+\[ x[n] = \delta[n-1] + \delta[n-2] + \delta[n-3] \]
+Or equivalently using unit steps:
+\[ x[n] = u[n-1] - u[n-4] \]
+
+These building blocks are essential in analyzing and designing discrete-time systems. They simplify the understanding of system behavior in response to different inputs.
+
+\newpage
+
+
+\section{Linear Time-Invariant (LTI) Systems}
+
+Linear Time-Invariant (LTI) systems are fundamental in signal processing because they provide a simple yet powerful framework for analyzing and understanding how systems respond to inputs. These systems have two key properties: linearity and time-invariance.
+
+\paragraph{Linearity}
+A system is linear if it satisfies the principles of superposition and scaling. Specifically, for any two input signals \( x_1[n] \) and \( x_2[n] \), and any constants \( a \) and \( b \), the system \( T \) is linear if:
+\[ T\{a x_1[n] + b x_2[n]\} = a T\{x_1[n]\} + b T\{x_2[n]\} \]
+
+\subparagraph{Example 1: Linear System}
+Consider the system defined by the operation \( T\{x[n]\} = 2x[n] \).
+
+\ 
+
+1. Let \( x_1[n] = \{1, 2, 3\} \) and \( x_2[n] = \{4, 5, 6\} \).
+
+\ 
+
+2. Let the constants \( a = 2 \) and \( b = 3 \).
+
+\ 
+
+
+First, apply the system to each signal separately and then combine the results:
+\[ T\{x_1[n]\} = 2 \cdot \{1, 2, 3\} = \{2, 4, 6\} \]
+\[ T\{x_2[n]\} = 2 \cdot \{4, 5, 6\} = \{8, 10, 12\} \]
+
+Now, scale and combine the input signals and apply the system:
+\[ a x_1[n] + b x_2[n] = 2 \cdot \{1, 2, 3\} + 3 \cdot \{4, 5, 6\} = \{2, 4, 6\} + \{12, 15, 18\} = \{14, 19, 24\} \]
+\[ T\{a x_1[n] + b x_2[n]\} = 2 \cdot \{14, 19, 24\} = \{28, 38, 48\} \]
+
+Now combine the results of the individual operations:
+\[ a T\{x_1[n]\} + b T\{x_2[n]\} = 2 \cdot \{2, 4, 6\} + 3 \cdot \{8, 10, 12\} = \{4, 8, 12\} + \{24, 30, 36\} = \{28, 38, 48\} \]
+
+Since \( T\{a x_1[n] + b x_2[n]\} = a T\{x_1[n]\} + b T\{x_2[n]\} \), the system \( T\{x[n]\} = 2x[n] \) is linear.
+
+\subparagraph{Example 2: Non-Linear System:}
+Consider the system defined by the operation \( T\{x[n]\} = x[n]^2 \).
+
+\ 
+
+
+1. Let \( x_1[n] = \{1, 2, 3\} \) and \( x_2[n] = \{4, 5, 6\} \).
+
+\ 
+
+2. Let the constants \( a = 2 \) and \( b = 3 \).
+
+\ 
+
+
+First, apply the system to each signal separately and then combine the results:
+\[ T\{x_1[n]\} = \{1, 4, 9\} \]
+\[ T\{x_2[n]\} = \{16, 25, 36\} \]
+
+Now, scale and combine the input signals and apply the system:
+\[ a x_1[n] + b x_2[n] = 2 \cdot \{1, 2, 3\} + 3 \cdot \{4, 5, 6\} = \{2, 4, 6\} + \{12, 15, 18\} = \{14, 19, 24\} \]
+\[ T\{a x_1[n] + b x_2[n]\} = \{14^2, 19^2, 24^2\} = \{196, 361, 576\} \]
+
+Now combine the results of the individual operations:
+\[ a T\{x_1[n]\} + b T\{x_2[n]\} = 2 \cdot \{1, 4, 9\} + 3 \cdot \{16, 25, 36\} = \{2, 8, 18\} + \{48, 75, 108\} = \{50, 83, 126\} \]
+
+Since \( T\{a x_1[n] + b x_2[n]\} \neq a T\{x_1[n]\} + b T\{x_2[n]\} \), the system \( T\{x[n]\} = x[n]^2 \) is non-linear.
+
+\subparagraph{Example 3: Linear System with Shift}
+Consider the system defined by the operation \( T\{x[n]\} = x[n-1] \).
+
+
+\ 
+
+1. Let \( x_1[n] = \{1, 2, 3, 4\} \) and \( x_2[n] = \{0, -1, -2, -3\} \).
+
+\ 
+
+2. Let the constants \( a = 1 \) and \( b = 2 \).
+
+\ 
+
+
+First, apply the system to each signal separately and then combine the results:
+\[ T\{x_1[n]\} = \{0, 1, 2, 3\} \]
+\[ T\{x_2[n]\} = \{0, 0, -1, -2\} \]
+
+Now, scale and combine the input signals and apply the system:
+\[ a x_1[n] + b x_2[n] = 1 \cdot \{1, 2, 3, 4\} + 2 \cdot \{0, -1, -2, -3\} = \{1, 2, 3, 4\} + \{0, -2, -4, -6\} = \{1, 0, -1, -2\} \]
+\[ T\{a x_1[n] + b x_2[n]\} = \{0, 1, 0, -1\} \]
+
+Now combine the results of the individual operations:
+\[ a T\{x_1[n]\} + b T\{x_2[n]\} = 1 \cdot \{0, 1, 2, 3\} + 2 \cdot \{0, 0, -1, -2\} = \{0, 1, 2, 3\} + \{0, 0, -2, -4\} = \{0, 1, 0, -1\} \]
+
+Since \( T\{a x_1[n] + b x_2[n]\} = a T\{x_1[n]\} + b T\{x_2[n]\} \), the system \( T\{x[n]\} = x[n-1] \) is linear.
+
+\ 
+
+
+These examples illustrate how linear systems satisfy the superposition and scaling properties, while non-linear systems do not. Understanding these properties helps in analyzing and designing systems in signal processing.
+
+
+
+
+\paragraph{Time-Invariance}
+A system is time-invariant if a time shift in the input signal results in an identical time shift in the output signal. Specifically, for any input signal \( x[n] \) and any time shift \( n_0 \), the system \( T \) is time-invariant if:
+\[ y[n] = T\{x[n]\} \]
+\[ y[n-n_0] = T\{x[n-n_0]\} \]
+
+In other words, if the input signal is delayed by \( n_0 \) samples, the output will also be delayed by the same amount \( n_0 \). Time-invariant systems do not change their behavior over time.
+
+\subparagraph{Example 1: Time-Invariant System}
+Consider the system defined by the operation \( T\{x[n]\} = x[n-2] \).
+
+1. Let \( x[n] = \{1, 2, 3, 4\} \).
+
+\ 
+
+2. The output \( y[n] = T\{x[n]\} = x[n-2] \).
+
+\ 
+
+
+First, apply the time shift to the input and then apply the system:
+\[ x[n-1] = \{?, 1, 2, 3\} \]
+where \( ? \) represents an undefined value because we do not have the value for \( x[n-1] \) at \( n < 0 \).
+
+Now apply the system:
+\[ T\{x[n-1]\} = x[(n-1)-2] = x[n-3] \]
+\[ y[n-1] = \{?, ?, 1, 2\} \]
+
+Now, apply the system to the input first and then apply the time shift:
+\[ y[n] = x[n-2] = \{?, ?, 1, 2\} \]
+\[ y[n-1] = \{?, ?, ?, 1\} \]
+
+Since \( y[n-1] = T\{x[n-1]\} \), the system \( T\{x[n]\} = x[n-2] \) is time-invariant.
+
+\subparagraph{Example 2: Time-Variant System}
+Consider the system defined by the operation \( T\{x[n]\} = n x[n] \).
+
+
+\ 
+
+1. Let \( x[n] = \{1, 2, 3, 4\} \).
+
+\ 
+
+2. The output \( y[n] = T\{x[n]\} = n x[n] \).
+
+
+\ 
+
+First, apply the time shift to the input and then apply the system:
+\[ x[n-1] = \{?, 1, 2, 3\} \]
+\[ T\{x[n-1]\} = (n-1) x[n-1] \]
+\[ y[n-1] = \{?, 0, 2, 6\} \]
+
+Now, apply the system to the input first and then apply the time shift:
+\[ y[n] = n x[n] = \{0, 2, 6, 12\} \]
+\[ y[n-1] = \{-1 \cdot 1, 0 \cdot 2, 1 \cdot 3, 2 \cdot 4\} = \{-1, 0, 3, 8\} \]
+
+Since \( y[n-1] \neq T\{x[n-1]\} \), the system \( T\{x[n]\} = n x[n] \) is time-variant.
+
+\subparagraph{Example 3: Testing Time-Invariance}
+Consider the system \( T\{x[n]\} = x[n] + x[n-1] \).
+
+\ 
+
+
+1. Let \( x[n] = \{1, 2, 3, 4\} \).
+
+\ 
+
+2. The output \( y[n] = T\{x[n]\} = x[n] + x[n-1] \).
+
+\ 
+
+
+First, apply the time shift to the input and then apply the system:
+\[ x[n-2] = \{?, ?, 1, 2\} \]
+\[ T\{x[n-2]\} = x[n-2] + x[n-3] \]
+\[ y[n-2] = \{?, ?, 1, 1+?\} \]
+
+Now, apply the system to the input first and then apply the time shift:
+\[ y[n] = x[n] + x[n-1] = \{?, 1+?, 2+1, 3+2\} \]
+\[ y[n-2] = \{?, ?, 1+?, 2+1\} = \{?, ?, 1, 3\} \]
+
+Since \( y[n-2] \neq T\{x[n-2]\} \), the system \( T\{x[n]\} = x[n] + x[n-1] \) is time-variant.
+
+\ 
+
+
+\ 
+
+
+These examples illustrate how to test for time-invariance by comparing the output of a time-shifted input signal with the time-shifted output of the original input signal. Understanding time-invariance helps in designing systems that are consistent and predictable over time.
+
+
+
+
+\paragraph{Importance of LTI Systems}
+LTI systems are important because they have well-defined and predictable behaviors. They allow for the use of powerful mathematical tools such as convolution, Fourier transform, and Z-transform to analyze and design systems. These properties make LTI systems applicable in various fields including communications, control systems, audio processing, and more.
+
+\paragraph{Impulse Response}
+The impulse response \( h[n] \) of a Linear Time-Invariant (LTI) system is the output of the system when the input is a unit impulse \( \delta[n] \). The unit impulse \( \delta[n] \) is defined as:
+\[ \delta[n] = \begin{cases}
+1 & n = 0 \\
+0 & n \neq 0
+\end{cases} \]
+
+The impulse response is fundamental because it fully characterizes an LTI system. This means that if we know the impulse response of an LTI system, we can determine the output for any arbitrary input signal using the process of convolution.
+
+\subparagraph{Definition and Properties}
+The impulse response \( h[n] \) has several important properties:
+
+1. \textbf{Linearity:}
+If an LTI system is subjected to a linear combination of inputs, the output is the same linear combination of the individual outputs corresponding to those inputs.
+
+2. \textbf{Time-Invariance:}
+The system's response to a time-shifted input is the time-shifted version of the system's response to the original input.
+
+\subparagraph{Significance of the Impulse Response}
+The impulse response is crucial for several reasons:
+
+\ 
+
+1. \textbf{System Characterization:}
+The impulse response completely characterizes an LTI system. By knowing \( h[n] \), we can predict the system's behavior for any input.
+
+\ 
+
+
+2. \textbf{Convolution:}
+The output \( y[n] \) for any input \( x[n] \) can be computed using the convolution sum:
+\[ y[n] = (x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n-k] \]
+
+\ 
+
+
+3. \textbf{System Analysis and Design:}
+Understanding the impulse response helps in analyzing and designing systems. It allows engineers to determine how a system will react to various inputs, which is essential in many applications such as filtering, signal processing, and control systems.
+
+\ 
+
+
+\subparagraph{Impulse Response Examples}
+
+
+\ 
+
+
+1. Consider an LTI system defined by the difference equation:
+\[ y[n] = 0.5 y[n-1] + x[n] \]
+
+To find the impulse response \( h[n] \), we set the input \( x[n] = \delta[n] \). The response of the system can be computed step by step:
+
+For \( n = 0 \):
+\[ y[0] = 0.5 y[-1] + \delta[0] = 0 + 1 = 1 \]
+
+For \( n = 1 \):
+\[ y[1] = 0.5 y[0] + \delta[1] = 0.5 \cdot 1 + 0 = 0.5 \]
+
+For \( n = 2 \):
+\[ y[2] = 0.5 y[1] + \delta[2] = 0.5 \cdot 0.5 + 0 = 0.25 \]
+
+Continuing this process, we get:
+\[ h[n] = \begin{cases}
+1 & n = 0 \\
+0.5^n & n > 0 \\
+0 & n < 0
+\end{cases} \]
+
+\ 
+
+
+2.  Finite Impulse Response (FIR) System: 
+Consider an LTI system with a finite impulse response given by:
+\[ y[n] = x[n] + 2x[n-1] + 3x[n-2] \]
+
+To find the impulse response \( h[n] \), we set the input \( x[n] = \delta[n] \):
+
+For \( n = 0 \):
+\[ y[0] = \delta[0] + 2\delta[-1] + 3\delta[-2] = 1 \]
+
+For \( n = 1 \):
+\[ y[1] = \delta[1] + 2\delta[0] + 3\delta[-1] = 2 \]
+
+For \( n = 2 \):
+\[ y[2] = \delta[2] + 2\delta[1] + 3\delta[0] = 3 \]
+
+For \( n > 2 \):
+\[ y[n] = \delta[n] + 2\delta[n-1] + 3\delta[n-2] = 0 \]
+
+Thus, the impulse response \( h[n] \) is:
+\[ h[n] = \{1, 2, 3\} \text{ for } n = 0, 1, 2 \]
+
+\ 
+
+
+3. Infinite Impulse Response (IIR) System: 
+Consider an LTI system with an infinite impulse response given by the difference equation:
+\[ y[n] = y[n-1] + x[n] \]
+
+To find the impulse response \( h[n] \), we set the input \( x[n] = \delta[n] \):
+
+For \( n = 0 \):
+\[ y[0] = \delta[0] = 1 \]
+
+For \( n = 1 \):
+\[ y[1] = y[0] + \delta[1] = 1 + 0 = 1 \]
+
+For \( n = 2 \):
+\[ y[2] = y[1] + \delta[2] = 1 + 0 = 1 \]
+
+Continuing this process, we get:
+\[ h[n] = \begin{cases}
+1 & n \geq 0 \\
+0 & n < 0
+\end{cases} \]
+
+\ 
+
+
+\subparagraph{Using Impulse Response for Convolution:}
+To determine the output of an LTI system for any input \( x[n] \), we convolve the input with the impulse response. This process can be broken down into steps:
+
+1. **Flip \( h[n] \):**
+\[ h[-n] \]
+
+2. **Shift \( h[-n] \) by \( n \):**
+\[ h[n-k] \]
+
+3. **Multiply \( x[k] \) and \( h[n-k] \):**
+\[ x[k] h[n-k] \]
+
+4. **Sum over all \( k \):**
+\[ y[n] = \sum_{k=-\infty}^{\infty} x[k] h[n-k] \]
+
+\subparagraph{Example: Convolution Using Impulse Response}
+Let \( x[n] = \{1, 2, 3\} \) and \( h[n] = \{1, -1, 2\} \):
+
+1. **Flip \( h[n] \):**
+\[ h[-n] = \{2, -1, 1\} \]
+
+2. **Shift \( h[-n] \) for each \( n \) and compute the product with \( x[k] \):
+For \( n = 0 \):
+\[ y[0] = 1 \cdot 2 = 2 \]
+
+For \( n = 1 \):
+\[ y[1] = 1 \cdot (-1) + 2 \cdot 2 = -1 + 4 = 3 \]
+
+For \( n = 2 \):
+\[ y[2] = 1 \cdot 1 + 2 \cdot (-1) + 3 \cdot 2 = 1 - 2 + 6 = 5 \]
+
+Thus, the output \( y[n] \) is:
+\[ y[n] = \{2, 3, 5\} \]
+
+\ 
+
+
+\subparagraph{Practical Applications}
+The concept of impulse response is widely used in various fields such as:
+
+\ 
+
+
+1. \textbf{Signal Processing:}
+Understanding and designing filters, where the impulse response defines the filter characteristics.
+
+\ 
+
+
+2. \textbf{Control Systems:}
+Designing controllers that modify system behavior based on the impulse response.
+
+\ 
+
+
+3. \textbf{Communications:}
+Analyzing the impact of transmission channels on signals, where the channel is characterized by its impulse response.
+
+\ 
+
+
+4. \textbf{Acoustics:}
+Modeling how sound propagates in a room, where the room's acoustic properties are described by its impulse response.
+
+\ 
+
+
+In summary, the impulse response \( h[n] \) is a fundamental concept in the analysis and design of LTI systems. It provides a complete description of the system's behavior and allows for the determination of the output for any input through the process of convolution.
+
+
+
+
+
+
+
+\section{Convolution Sum}
+
+The output \( y[n] \) of a discrete-time LTI system can be determined by the convolution of the input signal \( x[n] \) with the system's impulse response \( h[n] \):
+\[ y[n] = (x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n-k] \]
+
+\paragraph{Example: Convolution of Two Signals}
+Consider \( x[n] = \{1, 2, 3\} \) and \( h[n] = \{1, -1, 2\} \). The convolution \( y[n] = x[n] * h[n] \) is calculated as follows:
+
+\[
+\begin{aligned}
+y[0] &= x[0]h[0] \\
+y[1] &= x[0]h[1] + x[1]h[0] \\
+y[2] &= x[0]h[2] + x[1]h[1] + x[2]h[0] \\
+y[3] &= x[1]h[2] + x[2]h[1] \\
+y[4] &= x[2]h[2]
+\end{aligned}
+\]
+
+Thus, the resulting output is \( y[n] = \{1, 1, 4, 1, 6\} \).
+
+
+\paragraph{Convolution Sum}
+The output \( y[n] \) of a discrete-time Linear Time-Invariant (LTI) system can be determined by the convolution of the input signal \( x[n] \) with the system's impulse response \( h[n] \). This process is fundamental in understanding how LTI systems process signals. The convolution sum is given by:
+\[ y[n] = (x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n-k] \]
+
+\subparagraph{Understanding Convolution}
+Convolution is a mathematical operation that combines two sequences to produce a third sequence. In the context of discrete-time signals and systems, convolution describes how the shape of one signal (the input signal) is modified by another signal (the system's impulse response). This operation is essential for analyzing the behavior of LTI systems because it provides a systematic way to determine the output for any given input.
+
+\subparagraph{Impulse Response}
+The impulse response \( h[n] \) of an LTI system is the output of the system when the input is a unit impulse signal \( \delta[n] \). The impulse response characterizes the system completely, meaning that if you know \( h[n] \), you can determine the output for any input signal using convolution.
+
+\subparagraph{Properties of Convolution}
+
+\ 
+
+
+1. \textbf{Commutativity:}
+\[ x[n] * h[n] = h[n] * x[n] \]
+This property states that the order in which you perform the convolution does not matter.
+
+\ 
+
+
+2. \textbf{Associativity:}
+\[ x[n] * (h_1[n] * h_2[n]) = (x[n] * h_1[n]) * h_2[n] \]
+This property allows you to group convolutions in any order.
+
+\ 
+
+
+3. \textbf{Distributivity:}
+\[ x[n] * (h_1[n] + h_2[n]) = x[n] * h_1[n] + x[n] * h_2[n] \]
+This property allows you to distribute convolution over addition.
+
+\ 
+
+
+4. \textbf{Identity:}
+Convolution with a unit impulse \( \delta[n] \) leaves the signal unchanged:
+\[ x[n] * \delta[n] = x[n] \]
+
+\ 
+
+
+\subparagraph{Graphical Interpretation of Convolution}
+Convolution can be visualized as a sliding operation where the input signal is flipped and shifted, and at each step, the overlapping values are multiplied and summed.
+
+1. \textbf{Flip:}
+The signal \( h[n] \) is flipped to obtain \( h[-n] \).
+
+2. \textbf{Shift:}
+The flipped signal \( h[-n] \) is shifted by \( n \) to obtain \( h[n-k] \).
+
+3. \textbf{Multiply and Sum:}
+For each value of \( n \), the values of \( x[k] \) and \( h[n-k] \) are multiplied together and summed over all \( k \).
+
+\subparagraph{Steps to Perform Convolution:}
+To perform the convolution of two discrete-time signals \( x[n] \) and \( h[n] \):
+
+\ 
+
+
+1. **Flip** the impulse response \( h[n] \) to obtain \( h[-k] \).
+
+\ 
+
+2. **Shift** the flipped impulse response by \( n \) to get \( h[n-k] \).
+
+\ 
+
+3. **Multiply** the shifted impulse response by the input signal \( x[k] \) for all values of \( k \).
+
+\ 
+
+4. **Sum** the products for all values of \( k \) to get the output \( y[n] \).
+
+\subparagraph{Example Process:}
+Consider the input signal \( x[n] \) and the impulse response \( h[n] \):
+
+\[
+x[n] = \{1, 2, 3\}, \quad h[n] = \{1, -1, 2\}
+\]
+
+1. **Flip \( h[n] \):**
+\[
+h[-n] = \{2, -1, 1\}
+\]
+
+2. **Shift \( h[-n] \):**
+For \( n = 0 \):
+\[
+h[0-k] = h[-k] = \{2, -1, 1\}
+\]
+
+For \( n = 1 \):
+\[
+h[1-k] = \{?, 2, -1, 1\}
+\]
+
+For \( n = 2 \):
+\[
+h[2-k] = \{?, ?, 2, -1, 1\}
+\]
+
+3. **Multiply \( x[k] \) and \( h[n-k] \):**
+\[
+\begin{aligned}
+y[0] &= 1 \cdot 2 + 2 \cdot (-1) + 3 \cdot 1 = 2 - 2 + 3 = 3 \\
+y[1] &= 1 \cdot 2 + 2 \cdot (-1) = 2 - 2 = 0 \\
+y[2] &= 1 \cdot 1 = 1
+\end{aligned}
+\]
+
+4. **Sum the products to get \( y[n] \):**
+\[
+y[n] = \{3, 0, 1\}
+\]
+
+\subparagraph{Importance of Convolution in LTI Systems}
+Convolution is crucial because it provides a complete and systematic way to determine the output of an LTI system for any given input. By knowing the impulse response, we can predict the system's behavior in response to any input signal, making it a powerful tool for analysis and design in signal processing.
+
+
+
+\section{Stability and Causality}
+
+\paragraph{Stability}
+A system is stable if every bounded input produces a bounded output. This is also known as BIBO (Bounded-Input, Bounded-Output) stability. Mathematically, a system is stable if for every bounded input \( |x[n]| \leq M < \infty \), the output \( |y[n]| \) is also bounded. Specifically, there exists a constant \( N < \infty \) such that \( |y[n]| \leq N \) for all \( n \).
+
+\subparagraph{Definition and Criteria}
+To determine if a system is stable, we must analyze its response to any arbitrary bounded input signal. A bounded input signal \( x[n] \) satisfies:
+\[ |x[n]| \leq M \]
+for some finite constant \( M \). The system is stable if the corresponding output signal \( y[n] \) also satisfies:
+\[ |y[n]| \leq N \]
+for some finite constant \( N \).
+
+\subparagraph{Impulse Response and Stability}
+For an LTI system, stability can be directly related to its impulse response \( h[n] \). An LTI system is BIBO stable if and only if the impulse response is absolutely summable:
+\[ \sum_{n=-\infty}^{\infty} |h[n]| < \infty \]
+
+\subparagraph{Examples of Stability}
+
+\ 
+
+\textbf{Example 1: Stable System}
+Consider an LTI system with impulse response \( h[n] = (0.5)^n u[n] \), where \( u[n] \) is the unit step function.
+
+\ 
+
+
+To determine stability, we check if \( h[n] \) is absolutely summable:
+\[
+\sum_{n=0}^{\infty} |h[n]| = \sum_{n=0}^{\infty} |(0.5)^n| = \sum_{n=0}^{\infty} (0.5)^n
+\]
+
+This is a geometric series with a common ratio \( r = 0.5 \), which is less than 1. The sum of the series is:
+\[
+\sum_{n=0}^{\infty} (0.5)^n = \frac{1}{1 - 0.5} = 2
+\]
+
+Since the series converges to a finite value, the system is stable.
+
+
+\ 
+
+\textbf{Example 2: Unstable System}
+Consider an LTI system with impulse response \( h[n] = 2^n u[n] \).
+
+To determine stability, we check if \( h[n] \) is absolutely summable:
+\[
+\sum_{n=0}^{\infty} |h[n]| = \sum_{n=0}^{\infty} |2^n| = \sum_{n=0}^{\infty} 2^n
+\]
+
+This is a geometric series with a common ratio \( r = 2 \), which is greater than 1. The series does not converge to a finite value; it diverges to infinity:
+\[
+\sum_{n=0}^{\infty} 2^n \to \infty
+\]
+
+Since the series diverges, the system is not stable.
+
+\subparagraph{Practical Implications of Stability}
+
+\ 
+
+
+Stability is a critical property in the design and analysis of systems because unstable systems can produce unbounded outputs, leading to system failure or undesired behavior. Here are some practical implications:
+
+\ 
+
+
+1. \textbf{Control Systems:}
+
+In control systems, stability ensures that the system's response to inputs (such as changes in setpoint or disturbances) remains bounded and predictable. Unstable control systems can lead to oscillations, runaway behaviors, or system damage.
+
+\ 
+
+
+2. \textbf{Signal Processing:}
+
+In signal processing, stability ensures that filters and other processing elements do not produce outputs that grow without bound. This is crucial for applications like audio processing, where unbounded signals could result in distortion or speaker damage.
+
+\ 
+
+
+3. \textbf{Communications:}
+
+In communication systems, stability ensures that transmitted signals are received accurately without causing the receiver to produce unbounded outputs, which could lead to data corruption or loss of information.
+
+\subparagraph{Testing Stability}
+
+To test the stability of a system, we can use the following approaches:
+
+\ 
+
+
+1. Analyze the Impulse Response:
+   Check if the impulse response is absolutely summable for LTI systems.
+
+\ 
+
+
+2. Eigenvalue Analysis:
+   For systems represented by difference equations, analyze the eigenvalues of the system matrix. If all eigenvalues have magnitudes less than one, the system is stable.
+
+\ 
+
+
+3. BIBO Stability Criterion:
+   Apply the BIBO stability criterion by checking if every bounded input produces a bounded output.
+
+\ 
+
+
+\subparagraph{Example 3: Stability of a Difference Equation}
+Consider the system described by the difference equation:
+\[ y[n] - 0.8 y[n-1] = x[n] \]
+
+To analyze stability, we solve for the homogeneous solution (when \( x[n] = 0 \)):
+\[ y[n] = 0.8 y[n-1] \]
+
+The characteristic equation is:
+\[ y[n] = 0.8^n y[0] \]
+
+Since \( 0.8 < 1 \), the homogeneous solution decays to zero as \( n \to \infty \). Therefore, the system is stable because the output remains bounded for any bounded input.
+
+\subparagraph{Example 4: Stability of a Feedback System}
+Consider a feedback system with the transfer function:
+\[ H(z) = \frac{1}{1 - 0.9z^{-1}} \]
+
+The impulse response \( h[n] \) is:
+\[ h[n] = 0.9^n u[n] \]
+
+To check for stability, we sum the impulse response:
+\[
+\sum_{n=0}^{\infty} |0.9^n| = \sum_{n=0}^{\infty} 0.9^n = \frac{1}{1 - 0.9} = 10
+\]
+
+Since the sum converges to a finite value, the system is stable.
+
+\ 
+
+
+In conclusion, understanding stability is essential for ensuring that systems operate reliably and predictably. By analyzing the impulse response and applying stability criteria, we can design systems that remain stable under various conditions and inputs.
+
+
+
+
+\paragraph{Causality:}
+
+A system is causal if the output at any time \( n \) depends only on the current and past input values, not on future input values. In other words, a system is causal if \( y[n] \) depends only on \( x[k] \) for \( k \leq n \).
+
+
+
+
+\subparagraph{Example: Causal and Non-Causal Systems}
+
+Consider the following systems:
+
+\ 
+
+
+\( y[n] = x[n] + x[n-1] \): This system is causal because the output at time \( n \) depends only on the input at times \( n \) and \( n-1 \).
+
+\ 
+
+\( y[n] = x[n] + x[n+1] \): This system is non-causal because the output at time \( n \) depends on the future input at time \( n+1 \).
+
+\paragraph{System Representation}
+
+LTI systems can be represented using different methods, including:
+
+\ 
+
+
+1. \textbf{Difference Equations:} Describing the relationship between input and output signals using algebraic equations.
+
+\ 
+
+2. \textbf{Impulse Response:} Characterizing the system's response to a unit impulse input.
+
+\ 
+
+3. \textbf{System Function:} Using the Z-transform to represent the system in the frequency domain.
+
+\subparagraph{Example: System Representation with a Difference Equation}
+Consider a simple LTI system described by the difference equation:
+\[ y[n] - \frac{1}{2} y[n-1] = x[n] \]
+
+
+\ 
+
+The impulse response \( h[n] \) can be found by solving the equation with \( x[n] = \delta[n] \).
+
+\ 
+
+
+
+LTI systems form the backbone of many signal processing applications due to their predictable and manageable properties. Their analysis and design are critical for developing efficient and effective systems in various engineering fields.
+
+
+
+
+\section{Impulse Response and Convolution}
+
+
+The impulse response \( h[n] \) of a discrete-time Linear Time-Invariant (LTI) system is the output when the input is a unit impulse \( \delta[n] \):
+\[ h[n] = T\{\delta[n]\} \]
+
+\paragraph{Example: Finding the Impulse Response}
+
+Consider a system described by the difference equation:
+\[ y[n] - 0.5 y[n-1] = x[n] \]
+
+To find the impulse response \( h[n] \), set the input \( x[n] = \delta[n] \) and solve for \( y[n] \):
+
+\begin{itemize}
+    \item For \( n = 0 \):
+    \[ y[0] - 0.5 y[-1] = \delta[0] \]
+    Assuming initial rest \( y[-1] = 0 \):
+    \[ y[0] = 1 \]
+
+    \item For \( n = 1 \):
+    \[ y[1] - 0.5 y[0] = \delta[1] = 0 \]
+    \[ y[1] - 0.5 \cdot 1 = 0 \]
+    \[ y[1] = 0.5 \]
+
+    \item For \( n = 2 \):
+    \[ y[2] - 0.5 y[1] = \delta[2] = 0 \]
+    \[ y[2] - 0.5 \cdot 0.5 = 0 \]
+    \[ y[2] = 0.25 \]
+
+    \item Continuing this process, we get:
+    \[ h[n] = (0.5)^n u[n] \]
+\end{itemize}
+
+\paragraph{Convolution with Impulse Response}
+
+When you have the impulse response \( h[n] \) of a system, you can find the output \( y[n] \) for any input \( x[n] \) by convolving the input with the impulse response:
+\[ y[n] = (x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n-k] \]
+
+\paragraph{Example: Using the Impulse Response}
+Given an input \( x[n] = \{2, 1, 2\} \) and the impulse response \( h[n] = (0.5)^n u[n] \), compute the output by convolving \( x[n] \) with \( h[n] \):
+
+\begin{itemize}
+    \item For \( n = 0 \):
+    \[ y[0] = x[0] h[0] = 2 \cdot 1 = 2 \]
+
+    \item For \( n = 1 \):
+    \[ y[1] = x[0] h[1] + x[1] h[0] = 2 \cdot 0.5 + 1 \cdot 1 = 1 + 1 = 2 \]
+
+    \item For \( n = 2 \):
+    \[ y[2] = x[0] h[2] + x[1] h[1] + x[2] h[0] = 2 \cdot 0.25 + 1 \cdot 0.5 + 2 \cdot 1 = 0.5 + 0.5 + 2 = 3 \]
+
+    \item For \( n = 3 \):
+    \[ y[3] = x[1] h[2] + x[2] h[1] = 1 \cdot 0.25 + 2 \cdot 0.5 = 0.25 + 1 = 1.25 \]
+
+    \item For \( n = 4 \):
+    \[ y[4] = x[2] h[2] = 2 \cdot 0.25 = 0.5 \]
+\end{itemize}
+
+Thus, the output \( y[n] \) for the first few values is \( \{2, 2, 3, 1.25, 0.5\} \).
+
+\paragraph{Convolution with Unit Impulse}
+Convolution of any signal \( x[n] \) with a unit impulse \( \delta[n] \) gives the signal itself:
+\[ x[n] * \delta[n] = x[n] \]
+
+\ 
+
+This property is crucial as it shows that the unit impulse acts as an identity element in convolution.
+
+
+
+
+
+
+
+
+\newpage
+
+\paragraph{Problem Set: Discrete-Time Signals and Systems}
+
+\paragraph{Problem 1: Discrete-Time Signals}
+
+Given the discrete-time signal \( x[n] = \{1, 3, 2, 0, -1, -2, 1\} \):
+
+\begin{enumerate}
+    \item Sketch the signal \( x[n] \).
+    \item Determine whether the signal is even, odd, or neither.
+    \item Find the energy of the signal.
+\end{enumerate}
+
+\paragraph{Problem 2: Impulse Response and System Characterization}
+
+Consider an LTI system with the impulse response \( h[n] = \{1, -1, 2\} \):
+
+\begin{enumerate}
+    \item Sketch the impulse response \( h[n] \).
+    \item Determine if the system is stable.
+    \item Determine if the system is causal.
+\end{enumerate}
+
+\paragraph{Problem 3: Convolution Sum}
+
+Given the input signal \( x[n] = \{2, 1, 2\} \) and the impulse response \( h[n] = \{1, -1, 2\} \):
+
+\begin{enumerate}
+    \item Compute the output signal \( y[n] \) using the convolution sum.
+    \item Sketch the output signal \( y[n] \).
+\end{enumerate}
+
+\paragraph{Problem 4: Stability Analysis}
+
+Consider the system described by the difference equation \( y[n] - 0.5y[n-1] = x[n] \):
+
+\begin{enumerate}
+    \item Determine the impulse response \( h[n] \) of the system.
+    \item Analyze the stability of the system by checking if \( h[n] \) is absolutely summable.
+\end{enumerate}
+
+\paragraph{Problem 5: Causality Analysis}
+
+Given the following systems, determine if they are causal:
+
+\begin{enumerate}
+    \item \( y[n] = x[n] + 2x[n-1] \)
+    \item \( y[n] = x[n+1] - x[n] \)
+    \item \( y[n] = 3x[n-2] + x[n-3] \)
+\end{enumerate}
+
+\newpage
+
+\paragraph{Solutions}
+
+\paragraph{Solution to Problem 1: Discrete-Time Signals}
+
+\paragraph{Part (a): Sketch the signal \( x[n] \)}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$x[n]$},
+            title={Discrete-Time Signal $x[n]$},
+            grid=major,
+            xmin=-1, xmax=7,
+            ymin=-3, ymax=4,
+            xtick={0,1,2,3,4,5,6},
+            ytick={-2,-1,0,1,2,3}
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,1) (1,3) (2,2) (3,0) (4,-1) (5,-2) (6,1)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Discrete-Time Signal $x[n]$}
+\end{figure}
+
+\paragraph{Part (b): Even, Odd, or Neither}
+A signal \( x[n] \) is even if \( x[n] = x[-n] \) and odd if \( x[n] = -x[-n] \). 
+
+\[
+x[-n] = \{1, -2, -1, 0, 2, 3, 1\}
+\]
+Since \( x[n] \neq x[-n] \) and \( x[n] \neq -x[-n] \), the signal is neither even nor odd.
+
+\paragraph{Part (c): Energy of the Signal}
+The energy \( E \) of a discrete-time signal is given by:
+\[ E = \sum_{n=-\infty}^{\infty} |x[n]|^2 \]
+
+\[
+E = 1^2 + 3^2 + 2^2 + 0^2 + (-1)^2 + (-2)^2 + 1^2 = 1 + 9 + 4 + 0 + 1 + 4 + 1 = 20
+\]
+
+\paragraph{Solution to Problem 2: Impulse Response and System Characterization}
+
+\paragraph{Part (a): Sketch the impulse response \( h[n] \)}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$h[n]$},
+            title={Impulse Response $h[n]$},
+            grid=major,
+            xmin=-1, xmax=3,
+            ymin=-2, ymax=3,
+            xtick={0,1,2},
+            ytick={-1,0,1,2}
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,1) (1,-1) (2,2)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Impulse Response $h[n]$}
+\end{figure}
+
+\paragraph{Part (b): Stability}
+To check if the system is stable, we need to verify if the impulse response is absolutely summable:
+\[ \sum_{n=-\infty}^{\infty} |h[n]| = |1| + |-1| + |2| = 1 + 1 + 2 = 4 \]
+
+Since the sum is finite, the system is stable.
+
+\paragraph{Part (c): Causality}
+A system is causal if \( h[n] = 0 \) for \( n < 0 \). Since \( h[n] \) is defined for \( n \geq 0 \) and is zero otherwise, the system is causal.
+
+\paragraph{Solution to Problem 3: Convolution Sum}
+
+\paragraph{Part (a): Compute the output signal \( y[n] \)}
+Given \( x[n] = \{2, 1, 2\} \) and \( h[n] = \{1, -1, 2\} \):
+
+\[
+\begin{aligned}
+y[0] &= 2 \cdot 1 = 2 \\
+y[1] &= 2 \cdot (-1) + 1 \cdot 1 = -2 + 1 = -1 \\
+y[2] &= 2 \cdot 2 + 1 \cdot (-1) + 2 \cdot 1 = 4 - 1 + 2 = 5 \\
+y[3] &= 1 \cdot 2 + 2 \cdot (-1) = 2 - 2 = 0 \\
+y[4] &= 2 \cdot 2 = 4 \\
+\end{aligned}
+\]
+
+The output signal \( y[n] \) is \( \{2, -1, 5, 0, 4\} \).
+
+\paragraph{Part (b): Sketch the output signal \( y[n] \)}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth,
+            xlabel={$n$},
+            ylabel={$y[n]$},
+            title={Output Signal $y[n]$},
+            grid=major,
+            xmin=-1, xmax=5,
+            ymin=-2, ymax=6,
+            xtick={0,1,2,3,4},
+            ytick={-1,0,1,2,3,4,5}
+        ]
+            \addplot[only marks, mark=*] plot coordinates {
+                (0,2) (1,-1) (2,5) (3,0) (4,4)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Output Signal $y[n]$}
+\end{figure}
+
+\paragraph{Solution to Problem 4: Stability Analysis}
+
+\paragraph{Part (a): Impulse Response}
+Given the difference equation \( y[n] - 0.5y[n-1] = x[n] \), to find the impulse response, we set \( x[n] = \delta[n] \):
+
+For \( n = 0 \):
+\[ y[0] = \delta[0] = 1 \]
+
+For \( n = 1 \):
+\[ y[1] = 0.5 y[0] = 0.5 \cdot 1 = 0.5 \]
+
+For \( n = 2 \):
+\[ y[2] = 0.5 y[1] = 0.5 \cdot 0.5 = 0.25 \]
+
+Continuing this process, we get:
+\[ h[n] = (0.5)^n u[n] \]
+
+\paragraph{Part (b): Stability}
+To check stability, we verify if \( h[n] \) is absolutely summable:
+\[
+\sum_{n=0}^{\infty} |(0.5)^n| = \sum_{n=0}^{\infty} (0.5)^n = \frac{1}{1 - 0.5} = 2
+\]
+
+Since the sum is finite, the system is stable.
+
+\paragraph{Solution to Problem 5: Causality Analysis}
+
+\paragraph{Part (a): \( y[n] = x[n] + 2x[n-1] \)}
+The system depends on \( x[n] \) and \( x[n-1] \), which are present and past values of the input. Therefore, the system is causal.
+
+\paragraph{Part (b): \( y[n] = x[n+1] - x[n] \)}
+The system depends on \( x[n+1] \), which is a future value of the input. Therefore, the system is not causal.
+
+\paragraph{Part (c): \( y[n] = 3x[n-2] + x[n-3] \)}
+The system depends on \( x[n-2] \) and \( x[n-3] \), which are past values of the input. Therefore, the system is causal.
+
+\newpage
+
+\chapter{The Z-Transform}
+
+
+
+
+The Z-transform is a powerful tool for analyzing and designing discrete-time systems. It transforms a discrete-time signal from the time domain to the z-domain, providing a way to solve difference equations and analyze system behavior.
+
+\section{Definition and Properties}
+The Z-transform of a discrete-time signal \( x[n] \) is defined as:
+\[ X(z) = \mathcal{Z}\{x[n]\} = \sum_{n=-\infty}^{\infty} x[n] z^{-n} \]
+where \( z \) is a complex variable. This transformation converts the sequence \( x[n] \) into a function \( X(z) \) of the complex variable \( z \).
+
+\paragraph{Basic Examples}
+
+\subparagraph{Example 1: Z-Transform of a Unit Impulse}
+
+Consider the discrete-time signal \( \delta[n] \), the unit impulse function:
+\[ \delta[n] = \begin{cases}
+1 & n = 0 \\
+0 & n \neq 0
+\end{cases} \]
+
+The Z-transform of \( \delta[n] \) is:
+\[ X(z) = \mathcal{Z}\{\delta[n]\} = \sum_{n=-\infty}^{\infty} \delta[n] z^{-n} \]
+
+Since \( \delta[n] \) is 1 only at \( n = 0 \) and 0 otherwise, the sum simplifies to:
+\[ X(z) = \delta[0] z^{0} = 1 \]
+
+Thus, the Z-transform of the unit impulse \( \delta[n] \) is:
+\[ X(z) = 1 \]
+
+\subparagraph{Example 2: Z-Transform of a Unit Step Sequence}
+
+Consider the discrete-time signal \( u[n] \), the unit step function:
+\[ u[n] = \begin{cases}
+1 & n \geq 0 \\
+0 & n < 0
+\end{cases} \]
+
+The Z-transform of \( u[n] \) is:
+\[ X(z) = \mathcal{Z}\{u[n]\} = \sum_{n=-\infty}^{\infty} u[n] z^{-n} \]
+
+Since \( u[n] \) is 1 for \( n \geq 0 \) and 0 otherwise, the sum becomes:
+\[ X(z) = \sum_{n=0}^{\infty} z^{-n} \]
+
+This is a geometric series with the first term \( a = 1 \) and common ratio \( r = z^{-1} \). For the series to converge, \( |z| > 1 \). The sum of the geometric series is:
+\[ X(z) = \frac{1}{1 - z^{-1}} = \frac{z}{z - 1}, \quad |z| > 1 \]
+
+Thus, the Z-transform of the unit step function \( u[n] \) is:
+\[ X(z) = \frac{z}{z - 1}, \quad |z| > 1 \]
+
+\subparagraph{Example 3: Z-Transform of an Exponential Sequence}
+
+Consider the discrete-time signal \( x[n] = a^n u[n] \), where \( u[n] \) is the unit step function:
+\[ x[n] = \begin{cases}
+a^n & n \geq 0 \\
+0 & n < 0
+\end{cases} \]
+
+The Z-transform of \( x[n] = a^n u[n] \) is:
+\[ X(z) = \mathcal{Z}\{a^n u[n]\} = \sum_{n=-\infty}^{\infty} a^n u[n] z^{-n} \]
+
+Since \( u[n] \) is 1 for \( n \geq 0 \) and 0 otherwise, the sum becomes:
+\[ X(z) = \sum_{n=0}^{\infty} (a z^{-1})^n \]
+
+This is a geometric series with the first term \( a = 1 \) and common ratio \( r = a z^{-1} \). For the series to converge, \( |a z^{-1}| < 1 \), or equivalently \( |z| > |a| \). The sum of the geometric series is:
+\[ X(z) = \frac{1}{1 - a z^{-1}} = \frac{z}{z - a}, \quad |z| > |a| \]
+
+Thus, the Z-transform of the exponential sequence \( a^n u[n] \) is:
+\[ X(z) = \frac{z}{z - a}, \quad |z| > |a| \]
+
+\subparagraph{Example 4: Z-Transform of a Cosine Sequence}
+
+Consider the discrete-time signal \( x[n] = \cos(\omega_0 n) u[n] \), where \( u[n] \) is the unit step function:
+\[ x[n] = \cos(\omega_0 n) u[n] \]
+
+To find the Z-transform, we use the Euler's formula for cosine:
+\[ \cos(\omega_0 n) = \frac{e^{j \omega_0 n} + e^{-j \omega_0 n}}{2} \]
+
+Thus,
+\[ x[n] = \frac{1}{2} \left( e^{j \omega_0 n} + e^{-j \omega_0 n} \right) u[n] \]
+
+The Z-transform of \( x[n] \) is:
+\[ X(z) = \frac{1}{2} \left( \mathcal{Z}\{e^{j \omega_0 n} u[n]\} + \mathcal{Z}\{e^{-j \omega_0 n} u[n]\} \right) \]
+
+Using the property that the Z-transform of \( e^{j \omega_0 n} u[n] \) is \( \frac{z}{z - e^{j \omega_0}} \) for \( |z| > |e^{j \omega_0}| \), we get:
+\[ X(z) = \frac{1}{2} \left( \frac{z}{z - e^{j \omega_0}} + \frac{z}{z - e^{-j \omega_0}} \right) \]
+
+Combining the fractions:
+\[ X(z) = \frac{z}{2} \left( \frac{1}{z - e^{j \omega_0}} + \frac{1}{z - e^{-j \omega_0}} \right) \]
+\[ X(z) = \frac{z}{2} \left( \frac{z - e^{-j \omega_0} + z - e^{j \omega_0}}{(z - e^{j \omega_0})(z - e^{-j \omega_0})} \right) \]
+\[ X(z) = \frac{z (z - e^{j \omega_0} + z - e^{-j \omega_0})}{2 (z^2 - (e^{j \omega_0} + e^{-j \omega_0})z + 1)} \]
+\[ X(z) = \frac{z (2z - (e^{j \omega_0} + e^{-j \omega_0}))}{2 (z^2 - 2 \cos(\omega_0) z + 1)} \]
+\[ X(z) = \frac{z (2z - 2 \cos(\omega_0))}{2 (z^2 - 2 \cos(\omega_0) z + 1)} \]
+\[ X(z) = \frac{z (z - \cos(\omega_0))}{z^2 - 2 \cos(\omega_0) z + 1} \]
+
+Thus, the Z-transform of the cosine sequence \( \cos(\omega_0 n) u[n] \) is:
+\[ X(z) = \frac{z (z - \cos(\omega_0))}{z^2 - 2 \cos(\omega_0) z + 1}, \quad |z| > 1 \]
+
+\paragraph{Summary}
+The Z-transform converts a discrete-time signal into a complex function of \( z \). It simplifies the analysis and design of discrete-time systems by transforming convolution operations into multiplication and providing tools to solve difference equations. Understanding the basic examples of Z-transforms for common sequences helps in building a solid foundation for more advanced topics in signal processing and system analysis.
+
+
+
+\paragraph{Properties}
+
+The Z-transform has several important properties that make it useful for analyzing discrete-time systems:
+
+\ 
+
+1. \textbf{Linearity:}
+\[ \mathcal{Z}\{a x_1[n] + b x_2[n]\} = a X_1(z) + b X_2(z) \]
+where \( a \) and \( b \) are constants, and \( X_1(z) \) and \( X_2(z) \) are the Z-transforms of \( x_1[n] \) and \( x_2[n] \), respectively.
+
+\ 
+
+
+2. \textbf{Time Shifting:}
+If \( X(z) = \mathcal{Z}\{x[n]\} \), then:
+\[ \mathcal{Z}\{x[n-k]\} = z^{-k} X(z) \]
+
+\ 
+
+
+3. \textbf{Scaling in the z-domain:}
+If \( X(z) = \mathcal{Z}\{x[n]\} \), then:
+\[ \mathcal{Z}\{a^n x[n]\} = X\left(\frac{z}{a}\right) \]
+where \( a \) is a constant.
+
+\ 
+
+
+4. \textbf{Convolution:}
+If \( y[n] = x_1[n] * x_2[n] \), then:
+\[ Y(z) = X_1(z) X_2(z) \]
+where \( Y(z) \) is the Z-transform of \( y[n] \).
+
+\ 
+
+
+5. \textbf{Initial Value Theorem:}
+\[ x[0] = \lim_{z \to \infty} X(z) \]
+
+\ 
+
+
+6. \textbf{Final Value Theorem:}
+If the poles of \( (1 - z^{-1}) X(z) \) are inside the unit circle, then:
+\[ x[\infty] = \lim_{z \to 1} (1 - z^{-1}) X(z) \]
+
+\section{Region of Convergence}
+
+The Region of Convergence (ROC) is the range of values of \( z \) for which the Z-transform converges. The ROC is crucial for determining the behavior and stability of the system.
+
+\paragraph{Definition}
+The ROC of \( X(z) \) is the set of \( z \) values for which the Z-transform sum converges:
+\[ \text{ROC} = \{z \in \mathbb{C} : \sum_{n=-\infty}^{\infty} x[n] z^{-n} \text{ converges} \} \]
+
+\paragraph{Properties of ROC}
+1. The ROC does not contain any poles of \( X(z) \).
+2. If \( x[n] \) is a right-sided sequence, the ROC extends outward from the outermost pole.
+3. If \( x[n] \) is a left-sided sequence, the ROC extends inward from the innermost pole.
+4. If \( x[n] \) is a two-sided sequence, the ROC is a ring in the z-plane.
+
+\paragraph{Examples}
+1. \textbf{Right-sided Sequence:}
+For \( x[n] = a^n u[n] \):
+\[ X(z) = \sum_{n=0}^{\infty} (a z^{-1})^n = \frac{1}{1 - a z^{-1}}, \quad |z| > |a| \]
+
+2. \textbf{Left-sided Sequence:}
+For \( x[n] = -a^n u[-n-1] \):
+\[ X(z) = \sum_{n=-\infty}^{-1} (a z^{-1})^n = \frac{-a^{-1} z}{1 - a^{-1} z}, \quad |z| < |a| \]
+
+3. \textbf{Two-sided Sequence:}
+For \( x[n] = a^n \):
+\[ X(z) = \sum_{n=-\infty}^{\infty} (a z^{-1})^n \]
+\[ \text{ROC: } |z| > |a| \text{ or } |z| < |a| \]
+
+\section{Inverse Z-Transform}
+
+The inverse Z-transform is used to convert a function in the z-domain back to the time domain. There are several methods to perform the inverse Z-transform:
+
+\paragraph{Power Series Expansion}
+Express \( X(z) \) as a power series in \( z^{-1} \):
+\[ X(z) = \sum_{n=-\infty}^{\infty} x[n] z^{-n} \]
+The coefficients of \( z^{-n} \) are the values of \( x[n] \).
+
+\paragraph{Partial Fraction Expansion}
+Decompose \( X(z) \) into simpler fractions, each of which can be easily inverted:
+\[ X(z) = \frac{N(z)}{D(z)} \]
+Express \( X(z) \) as a sum of partial fractions and then use standard Z-transform pairs to find \( x[n] \).
+
+\paragraph{Contour Integration}
+Use the inverse Z-transform integral formula:
+\[ x[n] = \frac{1}{2\pi j} \oint_C X(z) z^{n-1} dz \]
+where \( C \) is a counterclockwise contour enclosing the origin and within the ROC.
+
+\paragraph{Examples}
+1. \textbf{Power Series Expansion:}
+If \( X(z) = \frac{z}{z-2} \):
+\[ X(z) = \frac{z}{z-2} = 1 + \frac{2}{z} + \frac{4}{z^2} + \cdots \]
+Thus, \( x[n] = 2^n u[n] \).
+
+2. \textbf{Partial Fraction Expansion:}
+If \( X(z) = \frac{z}{(z-1)(z-2)} \):
+\[ X(z) = \frac{A}{z-1} + \frac{B}{z-2} \]
+Solving for \( A \) and \( B \), we get:
+\[ X(z) = \frac{1}{z-1} - \frac{1}{z-2} \]
+Thus, \( x[n] = u[n] - 2^n u[n] \).
+
+In conclusion, the Z-transform is a powerful technique for analyzing discrete-time systems, providing insights into system behavior and stability. Understanding the Z-transform, its properties, the region of convergence, and the inverse Z-transform are essential for effective signal processing and system analysis.
+
+\end{document}
+
+
+
+
+
+
+
